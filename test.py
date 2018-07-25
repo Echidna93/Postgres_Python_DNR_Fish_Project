@@ -28,6 +28,7 @@ def load_data_from_dict():
             plt.plot(x2, y2, marker='o', transform=ccrs.Geodetic())
 
 shps = fiona.open("fom.shp")
+
 fig = plt.figure()
 ax = plt.axes(projection=ccrs.PlateCarree())
 ax.add_feature(cfeat.COASTLINE)
@@ -35,26 +36,27 @@ ax.add_feature(cfeat.LAND)
 ax.add_feature(cfeat.OCEAN)
 
 stateborders = cfeat.NaturalEarthFeature(category='cultural',
-                                    name='admin_1_states_provinces_lines',
-                                    scale='10m',
-                                    facecolor='none')
+                                         name='admin_1_states_provinces_lines',
+                                         scale='10m',
+                                         facecolor='none')
 intlborders = cfeat.NaturalEarthFeature(category='cultural',
-                                    name='admin_0_countries',
-                                    scale='50m',
-                                    facecolor='none')
+                                        name='admin_0_countries',
+                                        scale='50m',
+                                        facecolor='none')
 
 ax.add_feature(stateborders, edgecolor='black')
 ax.add_feature(intlborders, edgecolor='black')
-#ax.add_feature(details)
+# ax.add_feature(details)
 ax.add_feature(cfeat.LAND)
 ax.add_feature(cfeat.COASTLINE)
 ax.add_feature(cfeat.LAKES)
 ax.add_feature(cfeat.OCEAN)
 ax.add_feature(cfeat.RIVERS)
-def inc():
-    cursor.execute('SELECT utm_x, utm_y '
-                   'FROM dnr_fish '
-                   'WHERE EXTRACT(year FROM date_caught)=1967;')
+
+
+def inc(i):
+    sql = "SELECT utm_x, utm_y FROM dnr_fish WHERE EXTRACT(year FROM date_caught)={};".format(1960+i)
+    cursor.execute(sql)
     b = cursor.fetchall()
     x2=[]
     y2=[]
@@ -66,18 +68,20 @@ def inc():
         y2.append(y2n)
     return x2, y2
 
-def animate():
-        x2 = []
+def animate(*args):
+        global i
+        i = i + 1
         y2 = []
-        x2 , y2 = inc()
+        x2 , y2 = inc(i)
         print(x2, y2)
-        plt.scatter(x2, y2, color='blue', marker='o', transform=ccrs.Geodetic())
+        plt.scatter(x2, y2, color='blue', marker='o', s=2, transform=ccrs.Geodetic())
+        fig.canvas.flush_events()
         #i = i+1
 
-animate()
+#animate()
 
 
 ax.set_extent([-100, -85, 40, 55])
 
-#animm = anim.FuncAnimation(fig, animate, 4)
+animm = anim.FuncAnimation(fig, animate, 2, interval=1000, repeat_delay=100)
 plt.show()
