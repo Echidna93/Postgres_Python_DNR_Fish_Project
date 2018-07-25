@@ -29,31 +29,6 @@ def load_data_from_dict():
 
 shps = fiona.open("fom.shp")
 
-fig = plt.figure()
-ax = plt.axes(projection=ccrs.PlateCarree())
-ax.add_feature(cfeat.COASTLINE)
-ax.add_feature(cfeat.LAND)
-ax.add_feature(cfeat.OCEAN)
-
-stateborders = cfeat.NaturalEarthFeature(category='cultural',
-                                         name='admin_1_states_provinces_lines',
-                                         scale='10m',
-                                         facecolor='none')
-intlborders = cfeat.NaturalEarthFeature(category='cultural',
-                                        name='admin_0_countries',
-                                        scale='50m',
-                                        facecolor='none')
-
-ax.add_feature(stateborders, edgecolor='black')
-ax.add_feature(intlborders, edgecolor='black')
-# ax.add_feature(details)
-ax.add_feature(cfeat.LAND)
-ax.add_feature(cfeat.COASTLINE)
-ax.add_feature(cfeat.LAKES)
-ax.add_feature(cfeat.OCEAN)
-ax.add_feature(cfeat.RIVERS)
-
-
 def inc(i):
     sql = "SELECT utm_x, utm_y FROM dnr_fish WHERE EXTRACT(year FROM date_caught)={};".format(1960+i)
     cursor.execute(sql)
@@ -68,20 +43,70 @@ def inc(i):
         y2.append(y2n)
     return x2, y2
 
-def animate(*args):
+def animate(l, ax, fig):
+        ax.cla()
+        ax.add_feature(cfeat.COASTLINE)
+        ax.add_feature(cfeat.LAND)
+        ax.add_feature(cfeat.OCEAN)
+
+        stateborders = cfeat.NaturalEarthFeature(category='cultural',
+                                                 name='admin_1_states_provinces_lines',
+                                                 scale='10m',
+                                                 facecolor='none')
+        intlborders = cfeat.NaturalEarthFeature(category='cultural',
+                                                name='admin_0_countries',
+                                                scale='50m',
+                                                facecolor='none')
+
+        ax.add_feature(stateborders, edgecolor='black')
+        ax.add_feature(intlborders, edgecolor='black')
+        # ax.add_feature(details)
+        ax.add_feature(cfeat.LAND)
+        ax.add_feature(cfeat.COASTLINE)
+        ax.add_feature(cfeat.LAKES)
+        ax.add_feature(cfeat.OCEAN)
+        plt.title('stuff')
+        ax.add_feature(cfeat.RIVERS)
+        ax.set_extent([-100, -85, 40, 55])
+
         global i
         i = i + 1
         y2 = []
         x2 , y2 = inc(i)
         print(x2, y2)
         plt.scatter(x2, y2, color='blue', marker='o', s=2, transform=ccrs.Geodetic())
-        fig.canvas.flush_events()
+        #fig.canvas.flush_events()
         #i = i+1
 
 #animate()
 
+def main():
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+    ax.add_feature(cfeat.COASTLINE)
+    ax.add_feature(cfeat.LAND)
+    ax.add_feature(cfeat.OCEAN)
 
-ax.set_extent([-100, -85, 40, 55])
+    stateborders = cfeat.NaturalEarthFeature(category='cultural',
+                                             name='admin_1_states_provinces_lines',
+                                             scale='10m',
+                                             facecolor='none')
+    intlborders = cfeat.NaturalEarthFeature(category='cultural',
+                                            name='admin_0_countries',
+                                            scale='50m',
+                                            facecolor='none')
 
-animm = anim.FuncAnimation(fig, animate, 2, interval=1000, repeat_delay=100)
-plt.show()
+    ax.add_feature(stateborders, edgecolor='black')
+    ax.add_feature(intlborders, edgecolor='black')
+    # ax.add_feature(details)
+    ax.add_feature(cfeat.LAND)
+    ax.add_feature(cfeat.COASTLINE)
+    ax.add_feature(cfeat.LAKES)
+    ax.add_feature(cfeat.OCEAN)
+    ax.add_feature(cfeat.RIVERS)
+    ax.set_extent([-100, -85, 40, 55])
+    animm = anim.FuncAnimation(fig, animate, 2, fargs=(ax, fig), interval=1000, repeat_delay=100)
+    plt.show()
+    return animm
+
+main()
