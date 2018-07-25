@@ -1,13 +1,34 @@
 import matplotlib.pyplot as plt
 from matplotlib.collections import PatchCollection
 from fiona import collection
+import psycopg2
 import fiona
 import cartopy.crs as ccrs
 import cartopy.feature as cfeat
 from pyproj import Proj, transform as tran
+import matplotlib.animation as anim
+from matplotlib.animation import FuncAnimation
+
+
+connection = psycopg2.connect(dbname='dnr_fish', user='postgres', password='Edinburgh**1993', host='localhost')
+cursor = connection.cursor()
+
+i = 0
+startyear: int = 1890
+
+def load_data_from_dict():
+    for i in range(300):
+         shp = shps.next()
+         if shp['geometry'] != None:
+            s = shp['geometry']
+            x = s['coordinates']
+            inProj = Proj(init='epsg:26715')
+            outProj = Proj(init='epsg:4326')
+            x2, y2 = tran(inProj, outProj, x[0], x[1])
+            plt.plot(x2, y2, marker='o', transform=ccrs.Geodetic())
 
 shps = fiona.open("fom.shp")
-
+fig = plt.figure()
 ax = plt.axes(projection=ccrs.PlateCarree())
 ax.add_feature(cfeat.COASTLINE)
 ax.add_feature(cfeat.LAND)
@@ -30,16 +51,33 @@ ax.add_feature(cfeat.COASTLINE)
 ax.add_feature(cfeat.LAKES)
 ax.add_feature(cfeat.OCEAN)
 ax.add_feature(cfeat.RIVERS)
+def inc():
+    cursor.execute('SELECT utm_x, utm_y '
+                   'FROM dnr_fish '
+                   'WHERE EXTRACT(year FROM date_caught)=1967;')
+    b = cursor.fetchall()
+    x2=[]
+    y2=[]
+    inProj = Proj(init='epsg:26715')
+    outProj = Proj(init='epsg:4326')
+    for a in range(len(b)):
+        x2n, y2n = tran(inProj, outProj, b[a][0], b[a][1])
+        x2.append(x2n)
+        y2.append(y2n)
+    return x2, y2
 
-for i in range(300):
-     shp = shps.next()
-     if shp['geometry'] != None:
-        s = shp['geometry']
-        x = s['coordinates']
-        inProj = Proj(init='epsg:26715')
-        outProj = Proj(init='epsg:4326')
-        x2, y2 = tran(inProj, outProj, x[0], x[1])
-        plt.plot(x2, y2, marker='o', transform=ccrs.Geodetic())
+def animate():
+        x2 = []
+        y2 = []
+        x2 , y2 = inc()
+        print(x2, y2)
+        plt.scatter(x2, y2, color='blue', marker='o', transform=ccrs.Geodetic())
+        #i = i+1
+
+animate()
+
 
 ax.set_extent([-100, -85, 40, 55])
+
+#animm = anim.FuncAnimation(fig, animate, 4)
 plt.show()
