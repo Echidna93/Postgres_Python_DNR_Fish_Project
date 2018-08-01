@@ -1,0 +1,7 @@
+Python==3.6
+psycopg2==2.7.5
+matplotlib=2.2.2
+cartopy==0.16.0
+numpy==0.15.0
+wxpython==4.0.2
+pyproj==1.9.5.1
