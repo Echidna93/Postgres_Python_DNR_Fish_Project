@@ -5,7 +5,10 @@ import matplotlib.animation as anim
 import numpy as np
 from postgres_db_methods import init_scatter_and_fetch, inc
 
+#Create necessary initalizations
+#x,y empty lists to hold coordinates
 x,y=[],[]
+#
 fig = plt.figure()
 ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
 x_init, y_init = init_scatter_and_fetch(x, y)
