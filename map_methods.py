@@ -32,20 +32,22 @@ def init():
     ax.add_feature(cfeat.LAKES)
     ax.add_feature(cfeat.OCEAN)
     ax.add_feature(cfeat.RIVERS)
-    ax.set_extent([-100, -85, 40, 55])
+    ax.set_extent([-100, -83, 40, 55])
+    manager = plt.get_current_fig_manager()
+    manager.window.showMaximized()
 
 def animate(l, ax, fig, scat):
         global i
         i = i + 1
-        plt.title('{}'.format(1890 + i))
+        plt.title('{}'.format(1889 + i))
         x,y= inc(i)
         scat.set_offsets(np.c_[x, y])
 
-def main():
+def tour(*args):
     init()
     plt.title('{}'.format(1890))
     animm = anim.FuncAnimation(fig, animate, fargs=(ax, fig, scat), interval=1000, repeat_delay=100)
     plt.show()
     return animm
 
-main()
+#tour()
